@@ -1,6 +1,7 @@
 ﻿Shader "Custom/funamushi" {
     Properties {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
+		_PosParam("Position param", Range (0.0,1.0)) = 0.0
     }
 	SubShader {
    		Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
@@ -18,6 +19,7 @@
  			#include "UnityCG.cginc"
 
             uniform sampler2D _MainTex;
+			float _PosParam;
 
  			struct appdata_custom {
 				float4 vertex : POSITION;
@@ -60,7 +62,10 @@
 				//	finalposition = tv0;
 				//}
 
-				float rot = atan2(v.vertex.x, -v.vertex.z);
+				//float3 pos = v.vertex.xyz + v.vertex.xyz * _PosParam * 10.0f;
+				float3 pos = v.vertex.xyz * ( 1.0f + _PosParam * 10.0f);
+
+				float rot = atan2(pos.x, -pos.z);
 				float sinX = sin(rot);//sin( _RotationSpeed * _Time.z );
 				float cosX = cos(rot);//cos( _RotationSpeed * _Time.z );
 				float sinY = sin(rot);//sin( _RotationSpeed * _Time.z );
@@ -71,12 +76,8 @@
 			
 				float3 tv0 = float3((v.texcoord.x - 0.5f) * 3.0f, 0.0f, (v.texcoord.y - 0.5f) * 3.0f);
 				
-				//float3 tv0 = v.vertex.xyz;
-				//tv0.x += (v.texcoord.x - 0.5f) * 3.0f;
-				//tv0.z += (v.texcoord.y - 0.5f) * 3.0f;
-				
 				tv0.xz = mul(rotationMatrix, tv0.xz);
-				tv0 += v.vertex.xyz;
+				tv0 += pos.xyz;
 
 			    o.pos = mul( UNITY_MATRIX_MVP, float4(tv0,1));
 				o.uv = MultiplyUV(UNITY_MATRIX_TEXTURE0, v.texcoord);
