@@ -39,9 +39,25 @@
  			};
  			
             v2f vert(appdata_custom v)
-            {
+			{
+				float param = _PosParam;
+
+				if ((v.vertex.x > 0.0f) && (v.vertex.z > 0.0f))
+				{
+					param = param * _PosParam * _PosParam;
+				}
+				else if (v.vertex.x > 0.0f)
+				{
+					param = param * _PosParam;
+				}
+				else
+				{
+					param = param;
+				}
+
 				float scale = 3.0f;
-				float2 pos = v.vertex.xz * (1.0f + _PosParam * 10.0f);
+				float2 pos = v.vertex.xz * (1.0f + param * 10.0f);
+
 
 				float2 n = normalize(pos);
 				float2 r = float2(n.y, -n.x); // right direction
